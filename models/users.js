@@ -77,10 +77,6 @@ class User{
           }else{
             this.cart.items.push({productId:new ObjectId(product._id),quantity:1});
           }
-        
-            
-        
-       
         const db=getDb();
         return db.collection('users').updateOne(
             {_id:new ObjectId(this._id)},
@@ -88,6 +84,41 @@ class User{
         )
         .then(result=>{
             console.log("cart is updated");
+        console.log(result);
+        return result;
+       }).catch(err=>{
+        console.log(err);
+        throw err;
+       })
+    }
+    getCart(){
+        const db=getDb();
+        const productIds=this.cart.items.map(i=>{
+            return i.productId;
+        })
+        return db.collection("products").find({_id:{$in:productIds}}).toArray()
+        .then(products=>{
+        return products.map(p=>{
+            return {
+                ...p,quantity:this.cart.items.find(i=>{
+                    return i.productId.toString()===p._id.toString();
+                }).quantity
+            }
+        });
+        });
+    }
+    deleteCart(prodId){
+      const db=getDb();
+       let index = this.cart.items.findIndex(cp => cp.productId.toString()===prodId.toString());
+      if(index>=0){
+        this.cart.items.splice(index,1);
+      }
+      return db.collection('users').updateOne(
+            {_id:new ObjectId(this._id)},
+            {$set:{cart:this.cart}}
+        )
+        .then(result=>{
+            console.log("cart is deleted");
         console.log(result);
         return result;
        }).catch(err=>{
