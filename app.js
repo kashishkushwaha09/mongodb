@@ -4,9 +4,11 @@ const app=express();
 const mongoConnect=require('./utils/db-connection').mongoConnect;
 const productRoute=require('./routes/productRoute');
 const userRoute=require('./routes/userRoute');
+const cartRoute=require('./routes/cartRoutes');
 app.use(express.json());
 app.use('/api/products',productRoute);
 app.use('/api/users',userRoute);
+app.use('/api/carts',cartRoute);
 mongoConnect(()=>{
     app.listen(3000,()=>{
     console.log("app listen to port 3000"); 

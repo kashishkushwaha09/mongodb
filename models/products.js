@@ -2,18 +2,21 @@ const { ObjectId } = require('bson');
 
 const getDb=require('../utils/db-connection').getDb;
 class Product{
-    constructor(title,price,description,imageUrl,id){
+    constructor(title,price,description,imageUrl,id,userId){
         this.title=title;
         this.price=price;
         this.description=description;
         this.imageUrl=imageUrl;
+        if(id!==null)
         this._id=new ObjectId(id);
+        this.userId=userId;
     }
     save(){
        const db=getDb();
        let dbOp;
        if(this._id){
         // update one
+        console.log(`old product is ${this}`);
         dbOp=db.collection('products').updateOne({_id:this._id},{ $set: this });
        }else{
         console.log(`new product is ${this}`);

@@ -2,7 +2,7 @@ const { ObjectId } = require('bson');
 
 const getDb=require('../utils/db-connection').getDb;
 class User{
-    constructor(name,email,phone,password,id){
+    constructor(name,email,phone,password,id,cart){
         this.name=name;
         this.email=email;
         this.phone=phone;
@@ -10,6 +10,7 @@ class User{
          if (id) {
     this._id = new ObjectId(id); // only assign if id is passed
   }
+  this.cart=cart;
     }
     save(){
        const db=getDb();
@@ -61,5 +62,38 @@ class User{
     //     console.log(err);
     //    })
     // }
+    addToCart(product){
+        if(!this.cart){
+            this.cart={
+                items:[]
+            };
+        }
+       let index = this.cart.items.findIndex(cp => cp.productId.equals(product._id));
+      
+          if(index>=0){
+            this.cart.items[index].quantity++;
+            
+            
+          }else{
+            this.cart.items.push({productId:new ObjectId(product._id),quantity:1});
+          }
+        
+            
+        
+       
+        const db=getDb();
+        return db.collection('users').updateOne(
+            {_id:new ObjectId(this._id)},
+            {$set:{cart:this.cart}}
+        )
+        .then(result=>{
+            console.log("cart is updated");
+        console.log(result);
+        return result;
+       }).catch(err=>{
+        console.log(err);
+        throw err;
+       })
+    }
 }
 module.exports=User;
