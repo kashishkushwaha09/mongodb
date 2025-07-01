@@ -4,12 +4,12 @@ const app=express();
 const connectToMongo = require('./utils/db-connection');
 const productRoute=require('./routes/productRoute');
 const userRoute=require('./routes/userRoute');
-// const cartRoute=require('./routes/cartRoutes');
+const cartRoute=require('./routes/cartRoutes');
 // const orderRoute=require('./routes/ordersRoute');
 app.use(express.json());
 app.use('/api/products',productRoute);
 app.use('/api/users',userRoute);
-// app.use('/api/carts',cartRoute);
+app.use('/api/carts',cartRoute);
 // app.use('/api/orders',orderRoute);
 
 connectToMongo();

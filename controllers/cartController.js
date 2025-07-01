@@ -2,7 +2,7 @@ const Product = require("../models/products");
 
 exports.postCart=(req,res,next)=>{
     const prodId=req.body.productId;
-    Product.fetchById(prodId).then(product=>{
+    Product.findById(prodId).then(product=>{
         return req.user.addToCart(product)
         .then(result=>{
         console.log(result);
@@ -15,17 +15,18 @@ exports.postCart=(req,res,next)=>{
     })
     
 }
-exports.getCart=(req,res,next)=>{
-     req.user.getCart()
-        .then(products=>{
-        console.log(products);
-        res.status(200).json({message:"cart is fetched",products})
-    })
-     .catch(err=>{
-        console.log(err);
-        res.status(500).json({message:"something went wrong"})
-     })
-  
+exports.getCart=async(req,res,next)=>{
+  req.user.populate('cart.items.productId')
+  .then(user => {
+    res.status(200).json({
+      message: "Cart is fetched",
+      cart: user.cart.items
+    });
+  })
+  .catch(err => {
+    console.error("Error fetching cart:", err);
+    res.status(500).json({ message: "Something went wrong" });
+  });
     
 }
 exports.deleteCart=(req,res,next)=>{
