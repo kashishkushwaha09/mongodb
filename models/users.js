@@ -29,6 +29,14 @@ userSchema.methods.addToCart=function(product){
           }
         return this.save();
 }
+userSchema.methods.deleteCart=function(prodId){
+       let index = this.cart.items.findIndex(cp => cp.productId.toString()===prodId.toString());
+      if(index>=0){
+        this.cart.items.splice(index,1);
+      }
+      return this.save();
+    }
+
 module.exports=mongoose.model('User',userSchema);
 // const { ObjectId } = require('bson');
 
