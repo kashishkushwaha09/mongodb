@@ -1,7 +1,7 @@
 const User=require('../models/users');
 exports.addUser=(req,res,next)=>{
-     const {name,email,phone,password}=req.body;
-      const user=new User(name,email,phone,password);
+     const {name,email}=req.body;
+      const user=new User({name,email,cart:{items:[]}});
     user.save()
     .then(result=>{
         console.log("User Created!");
@@ -10,8 +10,9 @@ exports.addUser=(req,res,next)=>{
         console.log(err);
     })
 }
+
 exports.getUserId=(req,res,next)=>{
-    User.fetchById(req.params.id)
+    User.findById(req.params.id)
     .then(user=>{
      res.status(200).json({message:"User fetched successfully !",user});
     })

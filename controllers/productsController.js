@@ -2,11 +2,14 @@ const Product = require("../models/products");
 
 
 exports.postAddProduct=(req,res,next)=>{
+    console.log(req.body);
     const title=req.body.title;
     const price=req.body.price;
     const description=req.body.description;
     const imageUrl=req.body.imageUrl;
-    const product=new Product(title,price,description,imageUrl,null,req.user._id);
+    const product=new Product({
+        title,price,description,imageUrl,userId:req.user._id
+    });
     product.save()
     .then(result=>{
         console.log("Product Created!");
@@ -17,17 +20,18 @@ exports.postAddProduct=(req,res,next)=>{
 }
 
 exports.getProducts=(req,res,next)=>{
-  
-    Product.fetchAll()
-    .then(products=>{
+  Product.find().populate('userId','name')
+  .then(products => {
+    console.log("All Products:", products);
      res.status(200).json({message:"Products fetched successfully !",products});
-    })
-    .catch(err=>{
-        console.log(err);
-    })
+  })
+  .catch(err => {
+    console.error("Error fetching products:", err);
+  });
+   
 }
 exports.getProductId=(req,res,next)=>{
-    Product.fetchById(req.params.id)
+    Product.findById(req.params.id)
     .then(product=>{
      res.status(200).json({message:"Product fetched successfully !",product});
     })
@@ -38,8 +42,13 @@ exports.getProductId=(req,res,next)=>{
 exports.updateProduct=(req,res,next)=>{
     const {productId,title,price,description,imageUrl}=req.body;
     console.log(req.body)
-    const product=new Product(title,price,description,imageUrl,productId);
-    product.save()
+    Product.findById(productId).then(product=>{
+        product.title=title;
+        product.price=price;
+        product.description=description;
+        product.imageUrl=imageUrl;
+        return product.save();
+    })
     .then(product=>{
         console.log("Product Updated!");
         res.status(200).json({message:"Product updated successfully !",product});
@@ -49,7 +58,7 @@ exports.updateProduct=(req,res,next)=>{
     
 }
 exports.deleteProduct=(req,res,next)=>{
-    Product.deleteById(req.params.id)
+    Product.deleteOne({_id:req.params.id})
     .then(product=>{
         console.log("Product deleted !");
         res.status(200).json({message:"Product deleted successfully !",product});

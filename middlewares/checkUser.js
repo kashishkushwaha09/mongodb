@@ -1,9 +1,10 @@
 const User=require('../models/users');
 module.exports=(req,res,next)=>{
     console.log("req.body ",req.body)
- User.fetchById(req.body.userId)
+    const userId=req.body.userId || req.query.userId;
+ User.findById(userId)
  .then(user=>{
-    req.user=new User(user.name,user.email,user.phone,user.password,user._id,user.cart);
+    req.user=user;
     next();
  })
  .catch(err=>console.log(err));
