@@ -1,6 +1,7 @@
 const express=require('express');
 const router=express.Router();
 const orderController=require('../controllers/ordersController');
-router.post('/',orderController.postOrders);
+const checkUser=require('../middlewares/checkUser');
+router.post('/',checkUser,orderController.postOrders);
 router.get('/:userId',orderController.getOrders);
 module.exports=router;
